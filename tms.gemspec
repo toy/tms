@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{tms}
-  s.version = "1.0.0"
+  s.version = "1.0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Boba Fat"]
@@ -29,7 +29,8 @@ Gem::Specification.new do |s|
      "ext/tms.c",
      "lib/tms.rb",
      "lib/tms/backup.rb",
-     "lib/tms/space.rb"
+     "lib/tms/space.rb",
+     "tms.gemspec"
   ]
   s.homepage = %q{http://github.com/toy/tms}
   s.rdoc_options = ["--charset=UTF-8"]

@@ -14,6 +14,9 @@ class Tms::Backup
         backups_dir
       end
     end
+    def backups_dir=(dir)
+      @backups_dir = Pathname(dir)
+    end
 
     def list
       @list ||= begin

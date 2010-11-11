@@ -57,7 +57,7 @@ class Tms::Backup
             end
             total
           else
-            0
+            b.size
           end
         else
           puts "??? #{path}#{a.postfix}".red.bold

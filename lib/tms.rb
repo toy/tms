@@ -18,23 +18,38 @@ class Pathname
     ''
   end
 
-  def colored_size(options = {})
-    if exist?
-      if directory?
-        if options[:recursive]
-          total = 0
-          find do |path|
-            total += path.size rescue nil
+  def count_size(options = {})
+    if defined?(@counted_size)
+      @counted_size
+    else
+      @counted_size = if exist?
+        if directory?
+          if options[:recursive]
+            total = 0
+            find do |path|
+              total += path.size rescue nil
+            end
+            total
+          else
+            0
           end
-          Tms::Space.space(total, :color => true)
         else
-          '      '
+          size
         end
       else
-        Tms::Space.space(size, :color => true)
+        nil
       end
-    else
+    end
+  end
+
+  def colored_size(options = {})
+    case size = count_size(options)
+    when nil
       '!!!!!!'
+    when 0
+      '      '
+    else
+      Tms::Space.space(size, :color => true)
     end
   end
 end

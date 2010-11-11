@@ -24,9 +24,11 @@ class Tms::Backup
     end
 
     def diff(a, b)
+      total = 0
       (a.path.children(false) | b.path.children(false)).reject{ |child| child.to_s[0, 1] == '.' }.sort.each do |path|
-        compare(a.path + path, b.path + path, Pathname('/') + path)
+        total += compare(a.path + path, b.path + path, Pathname('/') + path)
       end
+      puts "#{'Total:'.bold} #{Tms::Space.space(total, :color => true)}"
     end
 
   private
@@ -35,21 +37,31 @@ class Tms::Backup
       case
       when !a.exist?
         puts "#{'  █'.green} #{b.colored_size(:recursive => true)} #{path}#{b.postfix}"
+        b.count_size || 0
       when !b.exist?
         puts "#{'█  '.blue} #{a.colored_size(:recursive => true)} #{path}#{a.postfix}"
+        0
       when a.ftype != b.ftype
         puts "#{'!!!'.red.bold} #{a.colored_size} #{path} (#{a.ftype}=>#{b.ftype})"
+        b.count_size || 0
       when a.lino != b.lino
         if a.readable? && b.readable?
           puts "#{'█≠█'.yellow} #{a.colored_size} #{path}#{a.postfix}" unless a.symlink? && a.readlink == b.readlink
           if a.real_directory?
+            total = 0
             (a.children(false) | b.children(false)).sort.each do |child|
-              compare(a + child, b + child, path + child)
+              total += compare(a + child, b + child, path + child)
             end
+            total
+          else
+            0
           end
         else
           puts "??? #{path}#{a.postfix}".red.bold
+          0
         end
+      else
+        0
       end
     end
   end

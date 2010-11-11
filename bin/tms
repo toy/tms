@@ -7,14 +7,28 @@ rescue LoadError
   require 'tms'
 end
 
-case ARGV.length
+require 'optparse'
+
+ids, options = ARGV.partition{ |arg| arg =~ /^-?\d+$/ }
+OptionParser.new do |op|
+  op.banner = <<-BANNER
+Usege:
+  List:                #{op.program_name} [options]
+  Diff:                #{op.program_name} [options] id1 id2
+  Diff with previous:  #{op.program_name} [options] id
+  BANNER
+
+  op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
+    Tms::Backup.backups_dir = dir
+  end
+end.parse!(options)
+
+ids = ids.map(&:to_i)
+case ids.length
 when 0
   Tms.list
 when 1
-  id = ARGV[0].to_i
-  Tms.diff(id - 1, id)
+  Tms.diff(ids[0] - 1, ids[0])
 when 2
-  Tms.diff(ARGV[0].to_i, ARGV[1].to_i)
-else
-  abort 'Max two arguments'
+  Tms.diff(ids[0], ids[1])
 end

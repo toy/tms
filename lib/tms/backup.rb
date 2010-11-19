@@ -20,9 +20,18 @@ class Tms::Backup
 
     def list
       @list ||= begin
-        backups_dir.children.select do |path|
-          path.basename.to_s =~ /^\d{4}-\d{2}-\d{2}-\d{6}$/
-        end.map(&method(:new)).sort_by(&:number)
+        backups = []
+        backups_dir.children.each do |path|
+          case path.basename.to_s
+          when /^\d{4}-\d{2}-\d{2}-\d{6}$/
+            backups << new(path)
+          when /^\d{4}-\d{2}-\d{2}-\d{6}\.inProgress$/
+            path.children.select(&:directory?).each do |path_in_progress|
+              backups << new(path_in_progress, true)
+            end
+          end
+        end
+        backups.sort
       end
     end
 
@@ -69,13 +78,14 @@ class Tms::Backup
     end
   end
 
-  attr_reader :path
-  def initialize(path)
+  attr_reader :path, :in_progress
+  def initialize(path, in_progress = false)
     @path = path
+    @in_progress = in_progress
   end
 
   def name
-    @name ||= path.basename.to_s
+    @name ||= in_progress ? "#{path.dirname.basename}/#{path.basename}" : path.basename.to_s
   end
 
   def started_at
@@ -95,9 +105,13 @@ class Tms::Backup
   }.each do |name, attr|
     class_eval <<-src
       def #{name}
-        @#{name} ||= xattr.get('#{attr}').to_i
+        @#{name} ||= xattr.get('#{attr}').to_i rescue '-'
       end
     src
+  end
+
+  def <=>(other)
+    name <=> other.name
   end
 
 private

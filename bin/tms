@@ -21,6 +21,10 @@ Usege:
   op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
     Tms::Backup.backups_dir = dir
   end
+
+  op.on('-p', '--progress', 'Show backups in progress') do
+    Tms::Backup.show_in_progress = true
+  end
 end.parse!(options)
 
 ids = ids.map(&:to_i)

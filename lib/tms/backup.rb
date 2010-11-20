@@ -18,6 +18,8 @@ class Tms::Backup
       @backups_dir = Pathname(dir)
     end
 
+    attr_accessor :show_in_progress
+
     def list
       @list ||= begin
         backups = []
@@ -26,8 +28,10 @@ class Tms::Backup
           when /^\d{4}-\d{2}-\d{2}-\d{6}$/
             backups << new(path)
           when /^\d{4}-\d{2}-\d{2}-\d{6}\.inProgress$/
-            path.children.select(&:directory?).each do |path_in_progress|
-              backups << new(path_in_progress, true)
+            if show_in_progress
+              path.children.select(&:directory?).each do |path_in_progress|
+                backups << new(path_in_progress, true)
+              end
             end
           end
         end

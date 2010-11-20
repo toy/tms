@@ -18,6 +18,7 @@ class Tms::Backup
       @backups_dir = Pathname(dir)
     end
 
+    attr_accessor :filter_dir
     attr_accessor :show_in_progress
 
     def list
@@ -41,8 +42,14 @@ class Tms::Backup
 
     def diff(a, b)
       total = 0
-      (a.path.children(false) | b.path.children(false)).reject{ |child| child.to_s[0, 1] == '.' }.sort.each do |path|
-        total += compare(a.path + path, b.path + path, Pathname('/') + path)
+      if filter_dir
+        root_dir = (a.path.children + b.path.children).select(&:directory?).select{ |child| Pathname(File.join(child, filter_dir)).exist? }.map(&:basename).uniq
+        root_dir = File.join(root_dir, filter_dir)
+        total += compare(a.path + root_dir, b.path + root_dir, Pathname('/') + root_dir)
+      else
+        (a.path.children(false) | b.path.children(false)).reject{ |child| child.to_s[0, 1] == '.' }.sort.each do |path|
+          total += compare(a.path + path, b.path + path, Pathname('/') + path)
+        end
       end
       puts "#{'Total:'.bold} #{Tms::Space.space(total, :color => true)}"
     end

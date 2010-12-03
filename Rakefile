@@ -9,7 +9,6 @@ begin
     gem.description = %Q{View avaliable Time Machine backups and show diff}
     gem.homepage = "http://github.com/toy/#{name}"
     gem.authors = ["Boba Fat"]
-    gem.platform = 'darwin'
     gem.add_dependency 'colored'
     gem.add_dependency 'xattr'
     gem.add_dependency 'mutter'

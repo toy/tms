@@ -1,9 +1,9 @@
 .DS_Store
-pkg
-doc
+/pkg
+/doc
 *.gem
 *.swp
-ext/Makefile
-ext/*.o
-ext/*.bundle
-lib/*.bundle
+Makefile
+*.o
+*.bundle
+/tmp

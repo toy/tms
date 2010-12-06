@@ -64,7 +64,7 @@ class Tms::Backup
         puts "#{'█  '.blue} #{a.colored_size(:recursive => true)} #{path}#{a.postfix}"
         0
       when a.ftype != b.ftype
-        puts "#{'!!!'.red.bold} #{a.colored_size} #{path} (#{a.ftype}=>#{b.ftype})"
+        puts "#{'!!!'.red.bold} #{a.colored_size(:recursive => true)} #{path} (#{a.ftype}=>#{b.ftype})"
         b.count_size || 0
       when a.lino != b.lino
         if a.readable? && b.readable?

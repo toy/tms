@@ -103,10 +103,13 @@ module Tms
       if b
         b_id = backup_id(b)
       else
-        if a_id == 0
+        if Backup.list.length == 1
+          abort("Only one backup exist")
+        elsif a_id == 0 || (Backup.list[a_id] && !Backup.list[a_id - 1])
           abort("No backup before oldest one")
+        else
+          a_id, b_id = a_id - 1, a_id
         end
-        a_id, b_id = a_id - 1, a_id
       end
       backup_a = Backup.list[a_id] or abort("No backup #{a}")
       backup_b = Backup.list[b_id] or abort("No backup #{b}")

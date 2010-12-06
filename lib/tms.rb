@@ -72,8 +72,8 @@ module Tms
     end
 
     def diff(a, b)
-      backup_a = Backup.list[a] || abort("No backup with id #{a}")
-      backup_b = Backup.list[b] || abort("No backup with id #{b}")
+      backup_b = Backup.list[b] or abort("No backup with id #{b}")
+      backup_a = Backup.list[a] or abort("No backup with id #{a}")
       Backup.diff(backup_a, backup_b)
     end
   end

@@ -9,38 +9,45 @@ end
 
 require 'optparse'
 
-ids, options = ARGV.partition{ |arg| arg =~ /^-?\d+$/ }
-OptionParser.new do |op|
-  op.banner = <<-BANNER
-Usege:
-  List:                #{op.program_name} [options]
-  Diff:                #{op.program_name} [options] id1 id2
-  Diff with previous:  #{op.program_name} [options] id
-  BANNER
+def option_parser
+  OptionParser.new do |op|
+    op.banner = <<-BANNER
+    Usege:
+      List:                #{op.program_name} [options]
+      Diff:                #{op.program_name} [options] id|nxxx id|nxxx
+      Diff with previous:  #{op.program_name} [options] id|nxxx
+      BANNER
 
-  op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
-    Tms::Backup.backups_dir = dir
+    op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
+      Tms::Backup.backups_dir = dir
+    end
+
+    op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory') do |dir|
+      Tms::Backup.filter_dir = dir
+    end
+
+    op.on('-p', '--[no-]progress', 'Show backups in progress') do |show_in_progress|
+      Tms::Backup.show_in_progress = show_in_progress
+    end
+
+    op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
+      Tms::Backup.show_all_columns = show_all_columns
+    end
   end
+end
 
-  op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory') do |dir|
-    Tms::Backup.filter_dir = dir
-  end
+options, ids = ARGV.partition{ |arg| arg =~ /^--?\D/ }
+begin
+  option_parser.parse!(options)
+rescue OptionParser::InvalidOption => e
+  abort e
+end
 
-  op.on('-p', '--[no-]progress', 'Show backups in progress') do |show_in_progress|
-    Tms::Backup.show_in_progress = show_in_progress
-  end
-
-  op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
-    Tms::Backup.show_all_columns = show_all_columns
-  end
-end.parse!(options)
-
-ids = ids.map(&:to_i)
 case ids.length
 when 0
   Tms.list
-when 1
-  Tms.diff(ids[0] - 1, ids[0])
-when 2
-  Tms.diff(ids[0], ids[1])
+when 1..2
+  Tms.diff(*ids)
+else
+  abort 'Max two arguments'
 end

@@ -98,13 +98,31 @@ module Tms
       end.print
     end
 
-    def diff(a, b)
-      backup_b = Backup.list[b] or abort("No backup with id #{b}")
-      backup_a = Backup.list[a] or abort("No backup with id #{a}")
+    def diff(a, b = nil)
+      a_id = backup_id(a)
+      if b
+        b_id = backup_id(b)
+      else
+        if a_id == 0
+          abort("No backup before oldest one")
+        end
+        a_id, b_id = a_id - 1, a_id
+      end
+      backup_a = Backup.list[a_id] or abort("No backup #{a}")
+      backup_b = Backup.list[b_id] or abort("No backup #{b}")
       Backup.diff(backup_a, backup_b)
     end
 
   private
+
+    def backup_id(arg)
+      if arg[0, 1] == 'n'
+        number = arg[/\d+/].to_i
+        Backup.list.index{ |backup| backup.number == number }
+      else
+        arg.to_i
+      end
+    end
 
     def format(value, type)
       case type

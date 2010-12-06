@@ -29,6 +29,10 @@ Usege:
   op.on('-p', '--[no-]progress', 'Show backups in progress') do |show_in_progress|
     Tms::Backup.show_in_progress = show_in_progress
   end
+
+  op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
+    Tms::Backup.show_all_columns = show_all_columns
+  end
 end.parse!(options)
 
 ids = ids.map(&:to_i)

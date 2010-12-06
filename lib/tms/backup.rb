@@ -9,7 +9,7 @@ class Tms::Backup
         abort 'can\'t get computer name' unless $?.success?
 
         backups_dir = Pathname(backup_volume) + 'Backups.backupdb' + computer_name
-        abort "ops backups dir is not a dir" unless backups_dir.directory?
+        abort "ops! backups dir is not a dir" unless backups_dir.directory?
 
         backups_dir
       end

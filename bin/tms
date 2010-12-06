@@ -26,8 +26,8 @@ Usege:
     Tms::Backup.filter_dir = dir
   end
 
-  op.on('-p', '--progress', 'Show backups in progress') do
-    Tms::Backup.show_in_progress = true
+  op.on('-p', '--[no-]progress', 'Show backups in progress') do |show_in_progress|
+    Tms::Backup.show_in_progress = show_in_progress
   end
 end.parse!(options)
 

@@ -12,9 +12,14 @@ class Pathname
   end
 
   def postfix
-    return '@' if symlink?
-    return '/' if directory?
-    ''
+    case
+    when symlink?
+      '@'
+    when directory?
+      '/'
+    else
+      ''
+    end
   end
 
   def count_size(options = {})

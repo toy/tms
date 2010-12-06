@@ -20,6 +20,7 @@ class Tms::Backup
 
     attr_accessor :filter_dir
     attr_accessor :show_in_progress
+    attr_accessor :show_all_columns
 
     def list
       @list ||= begin

@@ -15,7 +15,6 @@ Jeweler::Tasks.new do |gem|
   gem.authors = ['Boba Fat']
   gem.add_runtime_dependency 'colored'
   gem.add_runtime_dependency 'xattr'
-  gem.add_runtime_dependency 'mutter'
   gem.add_development_dependency 'jeweler', '~> 1.5.1'
   gem.add_development_dependency 'rake-compiler'
   gem.add_development_dependency 'rake-gem-ghost'

@@ -1,7 +1,6 @@
 require 'pathname'
 require 'colored'
 require 'xattr'
-require 'mutter'
 
 class Pathname
   def real_directory?
@@ -58,15 +57,23 @@ module Tms
   class << self
     def list
       backups = Backup.list
-      Mutter::Table.new do
-        column :align => :right, :style => :red
-        column :align => :right, :style => :blue
-        column :align => :right
-        column
-      end.tap do |table|
-        table << ['', '', 'num', 'name']
-        backups.each_with_index do |backup, i|
-          table << [i, i - backups.length, backup.number, backup.name]
+      Table.new do |t|
+        t.col '', :red
+        t.col '', :blue
+        t.col 'num'
+        t.col 'name'
+        if Backup.show_all_columns
+          %w[state type version started\ at finished\ at completed\ in].each do |name|
+            t.col name
+          end
+        end
+
+        backups.each_with_index do |b, i|
+          values = [i, i - backups.length, b.number, b.name]
+          if Backup.show_all_columns
+            values += [b.state, b.type, b.version, b.started_at, b.finished_at, b.completed_in]
+          end
+          t << values
         end
       end.print
     end
@@ -82,3 +89,4 @@ end
 require 'tms.so'
 require 'tms/backup'
 require 'tms/space'
+require 'tms/table'

@@ -1,3 +1,5 @@
+require 'colored'
+
 class Tms::Table
   attr_accessor :cols, :rows
 

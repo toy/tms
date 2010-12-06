@@ -1,3 +1,5 @@
+require 'colored'
+
 module Tms::Space
   SIZE_SYMBOLS = %w[B K M G T P E Z Y].freeze
   COLORS = [].tap do |colors|

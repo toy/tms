@@ -1,6 +1,3 @@
-require 'colored'
-require 'xattr'
-
 module Tms
   class << self
     def list

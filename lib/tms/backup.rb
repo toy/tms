@@ -1,3 +1,6 @@
+require 'colored'
+require 'xattr'
+
 class Tms::Backup
   class << self
     def backups_dir

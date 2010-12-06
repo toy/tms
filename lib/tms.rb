@@ -63,15 +63,30 @@ module Tms
         t.col 'num'
         t.col 'name'
         if Backup.show_all_columns
-          %w[state type version started\ at finished\ at completed\ in].each do |name|
-            t.col name
-          end
+          t.col 'state'
+          t.col 'type'
+          t.col 'version'
+          t.col 'completed in', nil, :right
+          t.col 'started at'
+          t.col 'finished at'
         end
 
         backups.each_with_index do |b, i|
-          values = [i, i - backups.length, b.number, b.name]
+          values = [
+            i,
+            i - backups.length,
+            b.number,
+            b.name
+          ]
           if Backup.show_all_columns
-            values += [b.state, b.type, b.version, b.started_at, b.finished_at, b.completed_in]
+            values += [
+              b.state,
+              b.type,
+              b.version,
+              format(b.completed_in, :time),
+              format(b.started_at, :date),
+              format(b.finished_at, :date)
+            ]
           end
           t << values
         end
@@ -82,6 +97,28 @@ module Tms
       backup_b = Backup.list[b] or abort("No backup with id #{b}")
       backup_a = Backup.list[a] or abort("No backup with id #{a}")
       Backup.diff(backup_a, backup_b)
+    end
+
+  private
+
+    def format(value, type)
+      case type
+      when :time
+        case value
+        when 0...60
+          "#{value.round} sec"
+        when 60...3600
+          '%.1f min' % (value / 60)
+        when 3600...86400
+          '%.1f hou' % (value / 3600)
+        else
+          '%.1f day' % (value / 86400)
+        end
+      when :date
+        value.strftime('%Y-%m-%d %H:%M:%S')
+      else
+        value
+      end
     end
   end
 end

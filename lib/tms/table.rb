@@ -6,8 +6,9 @@ class Tms::Table
     yield self if block_given?
   end
 
-  def col(name, color = nil)
-    @cols << {:name => name, :color => color}
+  ADJUST = {:left => :ljust, :right => :rjust, :center => :center}
+  def col(name, color = nil, adjust = nil)
+    @cols << {:name => name, :color => color, :adjust => ADJUST[adjust]}
   end
 
   def <<(row)
@@ -21,9 +22,11 @@ class Tms::Table
 
     ([@cols.map{ |col| col[:name] }] + @rows).each_with_index.map do |line, i|
       line.zip(@cols).map do |val, col|
-        width, color = col[:width], col[:color]
-        val_s = val.to_s.send(val.is_a?(Integer) ? :rjust : :ljust, width)
-        color ? Colored.colorize(val_s, :foreground => color) : val_s
+        width, color, adjust = col.values_at(:width, :color, :adjust)
+        adjust ||= val.is_a?(Integer) ? :rjust : :ljust
+        val_s = val.to_s.send(adjust, width)
+        val_s = Colored.colorize(val_s, :foreground => color) if color
+        val_s
       end.join(' ')
     end
   end

@@ -23,32 +23,24 @@ class Pathname
   end
 
   def count_size(options = {})
-    if defined?(@counted_size)
-      @counted_size
-    else
-      @counted_size = if exist?
+    if @count_size.nil?
+      if exist?
         if directory?
-          if options[:recursive]
-            total = 0
-            find do |path|
-              total += path.size rescue nil
-            end
-            total
-          else
-            0
-          end
+          @counted_size = 0
+          find{ |path| @counted_size += path.size rescue nil } if options[:recursive]
         else
-          size
+          @counted_size = size
         end
       else
-        nil
+        @counted_size = false
       end
     end
+    @counted_size
   end
 
   def colored_size(options = {})
     case size = count_size(options)
-    when nil
+    when false
       '!!!!!!'
     when 0
       '      '

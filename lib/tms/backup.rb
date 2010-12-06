@@ -24,20 +24,18 @@ class Tms::Backup
 
     def list
       @list ||= begin
-        backups = []
-        backups_dir.children.each do |path|
+        backups_dir.children.map do |path|
           case path.basename.to_s
           when /^\d{4}-\d{2}-\d{2}-\d{6}$/
-            backups << new(path)
+            new(path)
           when /^\d{4}-\d{2}-\d{2}-\d{6}\.inProgress$/
             if show_in_progress
               path.children.select(&:directory?).each do |path_in_progress|
-                backups << new(path_in_progress, true)
+                new(path_in_progress, true)
               end
             end
           end
-        end
-        backups.sort
+        end.flatten.compact.sort
       end
     end
 

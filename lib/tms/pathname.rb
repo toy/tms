@@ -20,17 +20,29 @@ class Pathname
     end
   end
 
+  def recursive_size
+    total = 0
+    find do |path|
+      begin
+        if path.file?
+          total += path.size
+        end
+      rescue
+      end
+    end
+    total
+  end
+
   def count_size(options = {})
     if @count_size.nil?
-      if exist?
+      @counted_size = if exist?
         if directory?
-          @counted_size = 0
-          find{ |path| @counted_size += path.size rescue nil } if options[:recursive]
+          options[:recursive] ? recursive_size : 0
         else
-          @counted_size = size
+          size
         end
       else
-        @counted_size = false
+        false
       end
     end
     @counted_size

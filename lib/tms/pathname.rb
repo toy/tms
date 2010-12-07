@@ -37,13 +37,6 @@ class Pathname
   end
 
   def colored_size(options = {})
-    case size = count_size(options)
-    when false
-      '!!!!!!'
-    when 0
-      '      '
-    else
-      Tms::Space.space(size, :color => true)
-    end
+    Tms::Space.space(count_size(options), :color => true)
   end
 end

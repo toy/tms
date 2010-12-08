@@ -36,7 +36,7 @@ def option_parser
   end
 end
 
-options, ids = ARGV.partition{ |arg| arg =~ /^--?\D/ }
+ids, options = ARGV.partition{ |arg| arg =~ /^[\-n]?\d+$/ }
 begin
   option_parser.parse!(options)
 rescue OptionParser::InvalidOption => e

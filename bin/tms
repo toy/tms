@@ -35,6 +35,10 @@ def option_parser
       Tms::Backup.show_all_columns = show_all_columns
     end
 
+    op.on('--[no-]decimal', 'Use base 10 size') do |use_decimal|
+      Tms::Space.base10 = use_decimal
+    end
+
     op.on_tail('-h', '--help', 'Show this message') do
       puts op.help
       exit

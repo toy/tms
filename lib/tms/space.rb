@@ -17,22 +17,29 @@ module Tms::Space
   EMPTY_SPACE = ' ' * LENGTH
   NOT_COUNTED_SPACE = ('!' * LENGTH).bold.red
 
-  def self.space(size, options = {})
-    case size
-    when false
-      NOT_COUNTED_SPACE
-    when 0
-      EMPTY_SPACE
-    else
-      number, degree = size, 0
-      while number.abs >= 1000 && degree < SIZE_SYMBOLS.length - 1
-        number /= 1024.0
-        degree += 1
-      end
+  class << self
+    attr_writer :base10
+    def denominator
+      @denominator ||= @base10 ? 1000.0 : 1024.0
+    end
 
-      space = "#{degree == 0 ? number.to_s : "%.#{PRECISION}f" % number}#{SIZE_SYMBOLS[degree]}".rjust(LENGTH)
-      color = [[Math.log(size) * COEF, 1].max.to_i, COLORS.length].min - 1
-      Colored.colorize(space, COLORS[color])
+    def space(size, options = {})
+      case size
+      when false
+        NOT_COUNTED_SPACE
+      when 0
+        EMPTY_SPACE
+      else
+        number, degree = size, 0
+        while number.abs >= 1000 && degree < SIZE_SYMBOLS.length - 1
+          number /= denominator
+          degree += 1
+        end
+
+        space = "#{degree == 0 ? number.to_s : "%.#{PRECISION}f" % number}#{SIZE_SYMBOLS[degree]}".rjust(LENGTH)
+        color = [[Math.log(size) * COEF, 1].max.to_i, COLORS.length].min - 1
+        Colored.colorize(space, COLORS[color])
+      end
     end
   end
 end

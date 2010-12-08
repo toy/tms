@@ -10,7 +10,7 @@ end
 require 'optparse'
 
 def option_parser
-  OptionParser.new do |op|
+  @option_parser ||= OptionParser.new do |op|
     op.banner = <<-BANNER
     Usege:
       List:                #{op.program_name} [options]
@@ -39,7 +39,7 @@ end
 ids, options = ARGV.partition{ |arg| arg =~ /^[\-n]?\d+$/ }
 begin
   option_parser.parse!(options)
-rescue OptionParser::InvalidOption => e
+rescue OptionParser::ParseError => e
   abort e
 end
 

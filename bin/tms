@@ -12,10 +12,11 @@ require 'optparse'
 def option_parser
   @option_parser ||= OptionParser.new do |op|
     op.banner = <<-BANNER
+    #{op.program_name}, version #{Tms.version}
+
     Usege:
-      List:                #{op.program_name} [options]
-      Diff:                #{op.program_name} [options] id|nxxx id|nxxx
-      Diff with previous:  #{op.program_name} [options] id|nxxx
+      List: #{op.program_name} [options]
+      Diff: #{op.program_name} [options] id|nXXX [id|nXXX]
       BANNER
 
     op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
@@ -33,6 +34,16 @@ def option_parser
     op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
       Tms::Backup.show_all_columns = show_all_columns
     end
+
+    op.on_tail('-h', '--help', 'Show this message') do
+      puts op.help
+      exit
+    end
+
+    op.on_tail('--version', 'Show version') do
+      puts Tms.version
+      exit
+    end
   end
 end
 
@@ -40,7 +51,7 @@ ids, options = ARGV.partition{ |arg| arg =~ /^[\-n]?\d+$/ }
 begin
   option_parser.parse!(options)
 rescue OptionParser::ParseError => e
-  abort e
+  abort "#{e.to_s}\n#{option_parser.help}"
 end
 
 case ids.length

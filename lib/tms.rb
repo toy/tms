@@ -1,5 +1,11 @@
+require 'tms/pathname'
+
 module Tms
   class << self
+    def version
+      (Pathname(__FILE__).dirname.dirname + 'VERSION').read.strip
+    end
+
     def list
       backups = Backup.list
       Table.new do |t|
@@ -93,4 +99,3 @@ require 'tms.so'
 require 'tms/backup'
 require 'tms/space'
 require 'tms/table'
-require 'tms/pathname'

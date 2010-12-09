@@ -3,22 +3,23 @@ require 'xattr'
 
 class Tms::Backup
   class << self
+    def backup_volume
+      Tms.backup_volume or abort('backup volume not avaliable')
+    end
+
+    def computer_name
+      Tms.computer_name or abort('can\'t get computer name')
+    end
+
     def backups_dir
       @backups_dir ||= begin
-        backup_volume = Tms.backup_volume
-        abort 'backup volume not avaliable' if backup_volume.nil?
-
-        computer_name = `scutil --get ComputerName`.strip
-        abort 'can\'t get computer name' unless $?.success?
-
-        backups_dir = Pathname(backup_volume) + 'Backups.backupdb' + computer_name
-        abort "ops! backups dir is not a dir" unless backups_dir.directory?
-
-        backups_dir
+        self.backups_dir = Pathname(backup_volume) + 'Backups.backupdb' + computer_name
       end
     end
-    def backups_dir=(dir)
-      @backups_dir = Pathname(dir)
+    def backups_dir=(backups_dir)
+      backups_dir = Pathname(backups_dir)
+      abort "backups dir '#{backups_dir}' is not a dir" unless backups_dir.directory?
+      @backups_dir = backups_dir
     end
 
     attr_accessor :filter_dir

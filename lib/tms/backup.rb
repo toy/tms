@@ -69,10 +69,10 @@ class Tms::Backup
       when a.ftype != b.ftype
         puts "#{'!!!'.red.bold} #{b.colored_size(:recursive => true)} #{path} (#{a.ftype}=>#{b.ftype})"
         b.count_size || 0
-      when a.lino != b.lino
+      when a.lstat.ino != b.lstat.ino
         if a.readable? && b.readable?
           puts "#{'█≠█'.yellow} #{a.colored_size} #{path}#{a.postfix}" unless a.symlink? && a.readlink == b.readlink
-          if a.real_directory?
+          if a.directory? && !a.symlink?
             total = 0
             (a.children(false) | b.children(false)).sort.each do |child|
               total += compare(a + child, b + child, path + child)

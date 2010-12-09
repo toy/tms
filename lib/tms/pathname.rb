@@ -1,14 +1,6 @@
 require 'pathname'
 
 class Pathname
-  def real_directory?
-    directory? && !symlink?
-  end
-
-  def lino
-    @ino ||= lstat.ino
-  end
-
   def postfix
     case
     when symlink?

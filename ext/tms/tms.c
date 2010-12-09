@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include <CoreServices/CoreServices.h>
+#include <SystemConfiguration/SystemConfiguration.h>>
 
 static VALUE backup_volume(VALUE self){
 	OSStatus status = pathTooLongErr;
@@ -35,7 +36,30 @@ static VALUE backup_volume(VALUE self){
 	}
 }
 
+static VALUE computer_name(VALUE self){
+	char *name;
+	size_t nameLength;
+
+	CFStringEncoding encoding;
+	CFStringRef cfName;
+
+	if (cfName = SCDynamicStoreCopyComputerName(NULL, &encoding)) {
+		name = malloc(nameLength = 256);
+		while (!CFStringGetCString(cfName, name, nameLength, encoding)) {
+			nameLength += 256;
+			name = reallocf(name, nameLength);
+		}
+
+		CFRelease(cfName);
+
+		return rb_str_new2(name);
+	} else {
+		return Qnil;
+	}
+}
+
 void Init_tms() {
 	VALUE cTms = rb_define_module("Tms");
 	rb_define_singleton_method(cTms, "backup_volume", backup_volume, 0);
+	rb_define_singleton_method(cTms, "computer_name", computer_name, 0);
 }

@@ -12,9 +12,10 @@ class Tms::Backup
     end
 
     def backups_dir
-      @backups_dir ||= begin
+      unless @backups_dir
         self.backups_dir = Pathname(backup_volume) + 'Backups.backupdb' + computer_name
       end
+      @backups_dir
     end
     def backups_dir=(backups_dir)
       backups_dir = Pathname(backups_dir)

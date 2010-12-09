@@ -4,7 +4,7 @@
 static VALUE backup_volume(VALUE self){
 	OSStatus status = pathTooLongErr;
 	char *path;
-	size_t pathLength = 256;
+	size_t pathLength;
 
 	CFDataRef aliasData;
 	AliasHandle alias;
@@ -15,7 +15,7 @@ static VALUE backup_volume(VALUE self){
 	if (aliasData) {
 		if (noErr == PtrToHand(CFDataGetBytePtr(aliasData), (Handle *)&alias, CFDataGetLength(aliasData))) {
 			if (noErr == FSResolveAlias(NULL, alias, &fs, &wasChanged)) {
-				path = malloc(pathLength);
+				path = malloc(pathLength = 256);
 				while (noErr != (status = FSRefMakePath(&fs, (UInt8*)path, pathLength))) {
 					if (pathTooLongErr == status) {
 						pathLength += 256;

@@ -35,11 +35,11 @@ def option_parser
       Tms::Backup.show_all_columns = show_all_columns
     end
 
-    op.on('-c', '--[no-]color', 'Use color (by default true if stdout is a tty)') do |colorize|
+    op.on('--[no-]color', 'Use color (by default true if stdout is a tty)') do |colorize|
       Tms::Backup.colorize = colorize
     end
 
-    op.on('-p', '--[no-]progress', 'Show progress when counting big folder size (by default true if stderr is a tty)') do |show_progress|
+    op.on('--[no-]progress', 'Show progress when counting big folder size (by default true if stderr is a tty)') do |show_progress|
       Tms::Backup.show_progress = show_progress
     end
 

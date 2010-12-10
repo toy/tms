@@ -22,7 +22,7 @@ class Tms::Backup
     end
     def backups_dir=(backups_dir)
       backups_dir = Pathname(backups_dir)
-      abort %{backups dir "#{backups_dir}" is not a dir} unless backups_dir.directory?
+      abort %{backups dir «#{backups_dir}» is not a dir} unless backups_dir.directory?
       @backups_dir = backups_dir
     end
 

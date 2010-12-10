@@ -29,6 +29,16 @@ class Tms::Backup
     better_attr_accessor :filter_dir
     better_attr_accessor :show_in_progress
     better_attr_accessor :show_all_columns
+    better_attr_accessor :colorize
+    better_attr_accessor :show_progress
+
+    def colorize?
+      !colorize.nil? ? colorize : $stdout.tty?
+    end
+
+    def show_progress?
+      !show_progress.nil? ? show_progress : $stderr.tty?
+    end
 
     def list
       @list ||= begin

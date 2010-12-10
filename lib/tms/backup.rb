@@ -1,8 +1,11 @@
 require 'colored'
 require 'xattr'
+require 'tms/better_attr_accessor'
 
 class Tms::Backup
   class << self
+    extend BetterAttrAccessor
+
     def backup_volume
       Tms.backup_volume or abort('backup volume not avaliable')
     end
@@ -23,9 +26,9 @@ class Tms::Backup
       @backups_dir = backups_dir
     end
 
-    attr_accessor :filter_dir
-    attr_accessor :show_in_progress
-    attr_accessor :show_all_columns
+    better_attr_accessor :filter_dir
+    better_attr_accessor :show_in_progress
+    better_attr_accessor :show_all_columns
 
     def list
       @list ||= begin
@@ -34,8 +37,8 @@ class Tms::Backup
           when /^\d{4}-\d{2}-\d{2}-\d{6}$/
             new(path)
           when /^\d{4}-\d{2}-\d{2}-\d{6}\.inProgress$/
-            if show_in_progress
               path.children.select(&:directory?).each do |path_in_progress|
+            if show_in_progress?
                 new(path_in_progress, true)
               end
             end
@@ -46,7 +49,7 @@ class Tms::Backup
 
     def diff(a, b)
       total = 0
-      if filter_dir
+      if filter_dir?
         root_dir = (a.path.children + b.path.children).select(&:directory?).select{ |child| Pathname(File.join(child, filter_dir)).exist? }.map(&:basename).uniq
         root_dir = File.join(root_dir, filter_dir)
         total += compare(a.path + root_dir, b.path + root_dir, Pathname('/') + root_dir)
@@ -93,14 +96,16 @@ class Tms::Backup
     end
   end
 
-  attr_reader :path, :in_progress
+  extend BetterAttrAccessor
+
+  better_attr_reader :path, :in_progress
   def initialize(path, in_progress = false)
     @path = path
     @in_progress = in_progress
   end
 
   def name
-    @name ||= in_progress ? "#{path.dirname.basename}/#{path.basename}" : path.basename.to_s
+    @name ||= in_progress? ? "#{path.dirname.basename}/#{path.basename}" : path.basename.to_s
   end
 
   def started_at

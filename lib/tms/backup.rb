@@ -47,8 +47,8 @@ class Tms::Backup
           when /^\d{4}-\d{2}-\d{2}-\d{6}$/
             new(path)
           when /^\d{4}-\d{2}-\d{2}-\d{6}\.inProgress$/
-              path.children.select(&:directory?).each do |path_in_progress|
             if show_in_progress?
+              path.children.select(&:directory?).map do |path_in_progress|
                 new(path_in_progress, true)
               end
             end

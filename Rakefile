@@ -9,7 +9,7 @@ name = 'tms'
 Jeweler::Tasks.new do |gem|
   gem.name = name
   gem.summary = %Q{Time Machine Status}
-  gem.description = %Q{View avaliable Time Machine backups and show diff}
+  gem.description = %Q{View avaliable Time Machine backups and show their diff}
   gem.homepage = "http://github.com/toy/#{name}"
   gem.license = 'MIT'
   gem.authors = ['Boba Fat']

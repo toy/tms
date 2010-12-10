@@ -3,7 +3,7 @@ require 'tms/pathname'
 module Tms
   class << self
     def version
-      (Pathname(__FILE__).dirname.dirname + 'VERSION').read.strip
+      File.read(File.join(File.dirname(__FILE__), '../VERSION')).strip
     end
 
     def list

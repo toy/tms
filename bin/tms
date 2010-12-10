@@ -27,7 +27,9 @@ def option_parser
       Tms::Backup.filter_dir = dir
     end
 
-    op.on('-i', '--[no-]in-progress', 'Show backups in progress') do |show_in_progress|
+    op.on('-i', '--[no-]in-progress', 'Show backups in progress',
+                                      '  (note: some directories will be',
+                                      '   empty in unfinished backups)') do |show_in_progress|
       Tms::Backup.show_in_progress = show_in_progress
     end
 
@@ -35,11 +37,11 @@ def option_parser
       Tms::Backup.show_all_columns = show_all_columns
     end
 
-    op.on('--[no-]color', 'Use color (by default true if stdout is a tty)') do |colorize|
+    op.on('--[no-]color', 'Use color', '  (true by default if stdout is a tty)') do |colorize|
       Tms::Backup.colorize = colorize
     end
 
-    op.on('--[no-]progress', 'Show progress when counting big folder size (by default true if stderr is a tty)') do |show_progress|
+    op.on('--[no-]progress', 'Show progress when counting folder size', '  (true by default if stderr is a tty)') do |show_progress|
       Tms::Backup.show_progress = show_progress
     end
 

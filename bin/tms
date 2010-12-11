@@ -13,12 +13,12 @@ def option_parser
       Diff: #{op.program_name} [options] id|nXXX [id|nXXX]
       BANNER
 
-    op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |dir|
-      Tms::Backup.backups_dir = dir
+    op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |backups_dir|
+      Tms::Backup.backups_dir = backups_dir
     end
 
-    op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory') do |dir|
-      Tms::Backup.filter_dir = dir
+    op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory', '  (can be used multiple times)') do |filter_dir|
+      Tms::Backup.add_filter_dir(filter_dir)
     end
 
     op.on('-i', '--[no-]in-progress', 'Show backups in progress',

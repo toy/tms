@@ -67,11 +67,42 @@ module Tms
       $stdout.puts "#{s}#{CLEAR_LINE}"
     end
 
+    def trim_right_colored(s, length)
+      length = 0 if length < 0
+      colorizers = []
+      s.gsub(/\e\[\d+(;\d+)*m/) do
+        if $`.length < length
+          length += $&.length
+        else
+          colorizers << $&
+        end
+      end
+      s[0, length] << colorizers.join('')
+    end
+
+    def trim_left_colored(s, length)
+      length = 0 if length < 0
+      colorizers = []
+      s.reverse.gsub(/m(\d+;)*\d+\[\e/) do
+        if $`.length < length
+          length += $&.length
+        else
+          colorizers << $&.reverse
+        end
+      end
+      length = s.length if length > s.length
+      colorizers.reverse.join('') << s[-length, length]
+    end
+
     def progress
       if Tms::Backup.show_progress?
         @last_progress ||= Time.now
         if (now = Time.now) > @last_progress + 0.1
-          $stderr.print "#{yield}#{CLEAR_LINE}\r"
+          line = yield.to_s
+          if width = terminal_width
+            line = trim_left_colored(line, terminal_width - 1)
+          end
+          $stderr.print "#{line}#{CLEAR_LINE}\r"
           @last_progress = now
         end
       end
@@ -104,6 +135,34 @@ module Tms
       line "#{prefix} #{space sub_total} #{postfix}"
       unless options[:no_total]
         @total += sub_total
+      end
+    end
+
+    def command_exists?(command)
+      `which #{command}`
+      $?.success?
+    end
+
+    # method from hirb: https://github.com/cldwalker/hirb
+    # Returns [width, height] of terminal when detected, nil if not detected.
+    # Think of this as a simpler version of Highline's Highline::SystemExtensions.terminal_size()
+    def terminal_size
+      if (ENV['COLUMNS'] =~ /^\d+$/) && (ENV['LINES'] =~ /^\d+$/)
+        [ENV['COLUMNS'].to_i, ENV['LINES'].to_i]
+      elsif (RUBY_PLATFORM =~ /java/ || (!STDIN.tty? && ENV['TERM'])) && command_exists?('tput')
+        [`tput cols`.to_i, `tput lines`.to_i]
+      elsif STDIN.tty? && command_exists?('stty')
+        `stty size`.scan(/\d+/).map{ |s| s.to_i }.reverse
+      else
+        nil
+      end
+    rescue
+      nil
+    end
+
+    def terminal_width
+      if size = terminal_size
+        size[0]
       end
     end
   end

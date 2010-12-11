@@ -5,7 +5,7 @@ module BetterAttrAccessor
       # leaves nil and false as is, returns true for everything else
       class_eval <<-RUBY
         def #{name}?
-          #{name} && true
+          @#{name} && true
         end
       RUBY
     end

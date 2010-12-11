@@ -2,20 +2,20 @@ require 'tms/space'
 
 module Tms
   class Comparison
-    attr_reader :a, :b, :total
-    def initialize(a, b)
-      @a, @b = a, b
+    attr_reader :backup_a, :backup_b, :total
+    def initialize(backup_a, backup_b)
+      @backup_a, @backup_b = backup_a, backup_b
     end
 
     def run
       @total = 0
       begin
-        root_dirs = (a.path.children(false) | b.path.children(false)).sort
-        root_dirs.reject!{ |c| c.path[0, 1] == '.' }
+        root_dirs = (backup_a.path.children(false) | backup_b.path.children(false)).sort
+        root_dirs.reject!{ |root_dir| root_dir.path[0, 1] == '.' }
         root_dirs.each do |root_dir|
-          dirs = Backup.filter_dirs? ? Backup.filter_dirs.map{ |fd| root_dir / fd } : [root_dir]
+          dirs = Backup.filter_dirs? ? Backup.filter_dirs.map{ |filter_dir| root_dir / filter_dir } : [root_dir]
           dirs.each do |dir|
-            compare(a.path / dir, b.path / dir, Path.new('/', dir))
+            compare(backup_a.path / dir, backup_b.path / dir, Path.new('/', dir))
           end
         end
       rescue Interrupt
@@ -30,32 +30,26 @@ module Tms
     def compare(a, b, path)
       case
       when !a.exist?
-        line "#{colorize '  █', :right    } #{count_space b} #{path}#{b.postfix}"
-        # line "#{colorize '  █', :right    } #{space b.count_size(:recursive => true)} #{path}#{b.postfix}"
-        # @total += b.count_size(:recursive => true) || 0
+        count_space b, path, colorize('  █', :right), "#{path}#{b.postfix}", :recursive => true
       when !b.exist?
-        line "#{colorize '█  ', :left     } #{count_space a} #{path}#{a.postfix}"
-        # line "#{colorize '█  ', :left     } #{space a.count_size(:recursive => true)} #{path}#{a.postfix}"
+        count_space a, path, colorize('█  ', :left), "#{path}#{a.postfix}", :recursive => true, :no_total => true
       when a.ftype != b.ftype
-        line "#{colorize '█≠█', :diff_type} #{count_space b} #{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})"
-        # line "#{colorize '█≠█', :diff_type} #{space b.count_size(:recursive => true)} #{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})"
-        @total += b.count_size(:recursive => true) || 0
+        count_space b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", :recursive => true
       when a.lstat.ino != b.lstat.ino
         if a.readable_real? && b.readable_real?
-          line "#{'█≠█'.yellow} #{count_space b} #{path}#{a.postfix}" if !a.symlink? || a.readlink != b.readlink
-          if a.directory? && !a.symlink?
+          count_space b, path, colorize('█≠█', :diff), "#{path}#{b.postfix}" unless b.symlink? && a.readlink == b.readlink
+          if b.directory? && !b.symlink?
             (a.children(false) | b.children(false)).sort.each do |child|
               compare(a / child, b / child, path / child)
             end
-          else
-            @total += b.size
           end
         else
           line "??? #{path}#{a.postfix}".red.bold
         end
       else
-        # $stderr << "#{CLEAR_LINE}#{path}\r"
-        # $stderr.flush
+        progress do
+          path
+        end
       end
     end
 
@@ -64,11 +58,22 @@ module Tms
       :right => {:foreground => :green},
       :left => {:foreground => :blue},
       :diff_type => {:foreground => :red, :extra => :bold},
+      :diff => {:foreground => :yellow},
     }
     CLEAR_LINE = "\e[K"
 
     def line(s)
-      puts "#{CLEAR_LINE}#{s}"
+      $stdout.puts "#{s}#{CLEAR_LINE}"
+    end
+
+    def progress
+      if Tms::Backup.show_progress?
+        @last_progress ||= Time.now
+        if (now = Time.now) > @last_progress + 0.1
+          $stderr.print "#{yield}#{CLEAR_LINE}\r"
+          @last_progress = now
+        end
+      end
     end
 
     def space(size)
@@ -83,38 +88,22 @@ module Tms
       end
     end
 
-    def count_space(backup)
-      Tms::Space.space(backup.path.size, :color => Tms::Backup.colorize?)
+    def count_space(backup_path, path, prefix, postfix, options = {})
+      sub_total = 0
+      if options[:recursive]
+        backup_path.find do |sub_path|
+          sub_total += sub_path.size_if_real_file
+          progress do
+            "#{prefix} #{space sub_total} #{path / sub_path.to_s[backup_path.to_s.length..-1].to_s}"
+          end
+        end
+      else
+        sub_total = backup_path.size_if_real_file
+      end
+      line "#{prefix} #{space sub_total} #{postfix}"
+      unless options[:no_total]
+        @total += sub_total
+      end
     end
   end
-
-  #   def recursive_size
-  #     total = 0
-  #     find do |path|
-  #       $stderr << "#{path}\e[K\r"
-  #       $stderr.flush
-  #       begin
-  #         if path.file?
-  #           total += path.size
-  #         end
-  #       rescue
-  #       end
-  #     end
-  #     total
-  #   end
-  #
-  #   def count_size(options = {})
-  #     if @count_size.nil?
-  #       @counted_size = if exist?
-  #         if directory?
-  #           options[:recursive] ? recursive_size : 0
-  #         else
-  #           size
-  #         end
-  #       else
-  #         false
-  #       end
-  #     end
-  #     @counted_size
-  #   end
 end

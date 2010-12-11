@@ -1,3 +1,5 @@
+require 'find'
+
 module Tms
   # cleaned up Pathname
   class Path
@@ -50,8 +52,16 @@ module Tms
       File.size(@path)
     end
 
+    def size_if_real_file
+      file? && !symlink? ? File.size(@path) : 0
+    end
+
     def exist?
       File.exist?(@path)
+    end
+
+    def file?
+      File.file?(@path)
     end
 
     def directory?
@@ -78,6 +88,14 @@ module Tms
         end
       end
       result
+    end
+
+    def find(&block)
+      if @path == '.'
+        Find.find(@path){ |f| yield self.class.new(f.sub(/^.\//, '')) }
+      else
+        Find.find(@path){ |f| yield self.class.new(f) }
+      end
     end
 
     def to_s

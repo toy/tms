@@ -44,7 +44,7 @@ module Tms
             end
           end
         else
-          line "??? #{path}#{a.postfix}".red.bold
+          line colorize("??? #{Space::NOT_COUNTED_SPACE} #{path}#{a.postfix}", :unreadable)
         end
       else
         progress do
@@ -59,6 +59,7 @@ module Tms
       :left => {:foreground => :blue},
       :diff_type => {:foreground => :red, :extra => :bold},
       :diff => {:foreground => :yellow},
+      :unreadable => {:foreground => :red, :extra => :bold},
     }
     CLEAR_LINE = "\e[K"
 

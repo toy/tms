@@ -61,6 +61,9 @@ begin
 rescue OptionParser::ParseError => e
   abort "#{e.to_s}\n#{option_parser.help}"
 end
+unless options.empty?
+  abort "Unknown arguments: #{options.join(' ')}"
+end
 
 case ids.length
 when 0

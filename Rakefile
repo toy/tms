@@ -1,4 +1,4 @@
-require 'rubygems'
+# require 'rubygems'
 require 'rake'
 require 'jeweler'
 require 'rake/gem_ghost_task'

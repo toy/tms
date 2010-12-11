@@ -1,4 +1,6 @@
-require 'tms/pathname'
+require 'tms/path'
+require 'tms/backup'
+require 'tms/table'
 
 module Tms
   class << self
@@ -9,8 +11,8 @@ module Tms
     def list
       backups = Backup.list
       Table.new do |t|
-        t.col '', :red
-        t.col '', :blue
+        t.col '', Backup.colorize? && :red
+        t.col '', Backup.colorize? && :blue
         t.col 'num'
         t.col 'name'
         if Backup.show_all_columns
@@ -59,7 +61,7 @@ module Tms
       end
       backup_a = Backup.list[a_id] or abort("No backup #{a}")
       backup_b = Backup.list[b_id] or abort("No backup #{b}")
-      Backup.diff(backup_a, backup_b)
+      Comparison.new(backup_a, backup_b).run
     end
 
   private
@@ -94,8 +96,3 @@ module Tms
     end
   end
 end
-
-require 'tms.so'
-require 'tms/backup'
-require 'tms/space'
-require 'tms/table'

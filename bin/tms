@@ -3,22 +3,34 @@
 require 'tms'
 require 'optparse'
 
-def option_parser
-  @option_parser ||= OptionParser.new do |op|
-    op.banner = <<-BANNER
-    #{op.program_name}, version #{Tms.version}
+def option_parser(type = nil)
+  @option_parser ||= {}
+  @option_parser[type] ||= OptionParser.new do |op|
+    op.banner = <<-TEXT
+#{op.program_name}, version #{Tms.version}
 
-    Usege:
-      List: #{op.program_name} [options]
-      Diff: #{op.program_name} [options] id|nXXX [id|nXXX]
-      BANNER
+Usege:
+  List: #{op.program_name} [options]
+  Diff: #{op.program_name} [options] id|nXXX [id|nXXX]
+
+    TEXT
+
+    if type
+      op.banner << <<-TEXT
+Options for #{type} (-h to view all options):
+
+      TEXT
+    end
 
     op.on('-d', '--directory DIRECTORY', 'Use backup directory') do |backups_dir|
       Tms::Backup.backups_dir = backups_dir
     end
 
-    op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory', '  (can be used multiple times)') do |filter_dir|
-      Tms::Backup.add_filter_dir(filter_dir)
+    unless type == :list
+      op.on('-f', '--filter DIRECTORY', 'Show diff starting from directory',
+                                        '  (can be used multiple times)') do |filter_dir|
+        Tms::Backup.add_filter_dir(filter_dir)
+      end
     end
 
     op.on('-i', '--[no-]in-progress', 'Show backups in progress',
@@ -27,20 +39,28 @@ def option_parser
       Tms::Backup.show_in_progress = show_in_progress
     end
 
-    op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
-      Tms::Backup.show_all_columns = show_all_columns
+    unless type == :diff
+      op.on('-l', '--[no-]long', 'Show more info about backup in list') do |show_all_columns|
+        Tms::Backup.show_all_columns = show_all_columns
+      end
     end
 
-    op.on('--[no-]color', 'Use color', '  (true by default if stdout is a tty)') do |colorize|
+    op.on('--[no-]color', 'Use color',
+                          '  (true by default if stdout is a tty)') do |colorize|
       Tms::Backup.colorize = colorize
     end
 
-    op.on('--[no-]progress', 'Show progress when counting folder size', '  (true by default if stderr is a tty)') do |show_progress|
-      Tms::Backup.show_progress = show_progress
+    unless type == :list
+      op.on('--[no-]progress',  'Show progress when counting folder size',
+                                '  (true by default if stderr is a tty)') do |show_progress|
+        Tms::Backup.show_progress = show_progress
+      end
     end
 
-    op.on('--[no-]decimal', 'Use base 10 size') do |use_decimal|
-      Tms::Space.base10 = use_decimal
+    unless type == :list
+      op.on('--[no-]decimal', 'Use base 10 size') do |use_decimal|
+        Tms::Space.base10 = use_decimal
+      end
     end
 
     op.on_tail('-h', '--help', 'Show this message') do
@@ -48,7 +68,7 @@ def option_parser
       exit
     end
 
-    op.on_tail('--version', 'Show version') do
+    op.on_tail('-v', '--version', 'Show version') do
       puts Tms.version
       exit
     end
@@ -57,9 +77,14 @@ end
 
 ids, options = ARGV.partition{ |arg| arg =~ /^[\-n]?\d+$/ }
 begin
-  option_parser.parse!(options)
+  option_parser.parse(options) # exits on -h or -v
 rescue OptionParser::ParseError => e
-  abort "#{e.to_s}\n#{option_parser.help}"
+end
+type = ids.empty? ? :list : :diff
+begin
+  option_parser(type).parse!(options)
+rescue OptionParser::ParseError => e
+  abort "#{e.to_s}\n#{option_parser(type).help}"
 end
 unless options.empty?
   abort "Unknown arguments: #{options.join(' ')}"

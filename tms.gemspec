@@ -5,21 +5,21 @@
 
 Gem::Specification.new do |s|
   s.name = %q{tms}
-  s.version = "1.3.1"
+  s.version = "1.3.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Boba Fat"]
-  s.date = %q{2010-12-12}
+  s.authors = ["Ivan Kuchin"]
+  s.date = %q{2010-12-15}
   s.default_executable = %q{tms}
   s.description = %q{View avaliable Time Machine backups and show their diff}
   s.executables = ["tms"]
   s.extensions = ["ext/tms/extconf.rb"]
   s.extra_rdoc_files = [
-    "LICENSE",
+    "LICENSE.txt",
     "README.markdown"
   ]
   s.files = [
-    "LICENSE",
+    "LICENSE.txt",
     "README.markdown",
     "Rakefile",
     "VERSION",

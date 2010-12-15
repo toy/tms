@@ -12,7 +12,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{View avaliable Time Machine backups and show their diff}
   gem.homepage = "http://github.com/toy/#{name}"
   gem.license = 'MIT'
-  gem.authors = ['Boba Fat']
+  gem.authors = ['Ivan Kuchin']
   gem.add_runtime_dependency 'colored'
   gem.add_runtime_dependency 'xattr'
   gem.add_development_dependency 'jeweler', '~> 1.5.1'

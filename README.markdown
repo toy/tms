@@ -48,4 +48,4 @@ Other options:
 
 ## Copyright
 
-Copyright (c) 2010 Boba Fat. See LICENSE for details.
+Copyright (c) 2010 Ivan Kuchin. See LICENSE.txt for details.

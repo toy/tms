@@ -63,8 +63,8 @@ Options for #{type} (-h to view all options):
       end
     end
 
-    op.on_tail('-h', '--help', 'Show this message') do
-      puts op.help
+    op.on_tail('-h', '--help', 'Show full help') do
+      puts option_parser.help
       exit
     end
 
@@ -76,10 +76,6 @@ Options for #{type} (-h to view all options):
 end
 
 ids, options = ARGV.partition{ |arg| arg =~ /^[\-n]?\d+$/ }
-begin
-  option_parser.parse(options) # exits on -h or -v
-rescue OptionParser::ParseError => e
-end
 type = ids.empty? ? :list : :diff
 begin
   option_parser(type).parse!(options)

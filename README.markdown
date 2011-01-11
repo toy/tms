@@ -8,7 +8,7 @@ Name from [fernlightning.com](http://www.fernlightning.com/doku.php?id=software:
 
 ## INSTALL:
 
-    gem install progress # use sudo if you need
+    gem install tms # use sudo if you need
 
 ## USAGE:
 

@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'tms/path'
 require 'tms/backup'
 require 'tms/table'

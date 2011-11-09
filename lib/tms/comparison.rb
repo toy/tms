@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'tms/space'
 
 module Tms

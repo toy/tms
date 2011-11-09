@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'xattr'
 require 'tms.so'
 require 'tms/comparison'

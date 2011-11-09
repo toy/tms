@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module BetterAttrAccessor
   def better_attr_reader(*names)
     names.each do |name|

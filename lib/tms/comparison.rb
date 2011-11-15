@@ -32,14 +32,14 @@ module Tms
     def compare(a, b, path)
       case
       when !a.exist?
-        count_space b, path, colorize('  █', :right), "#{path}#{b.postfix}", :recursive => true
+        diff_line b, path, colorize('  █', :right), "#{path}#{b.postfix}", :recursive => true
       when !b.exist?
-        count_space a, path, colorize('█  ', :left), "#{path}#{a.postfix}", :recursive => true, :no_total => true
+        diff_line a, path, colorize('█  ', :left), "#{path}#{a.postfix}", :recursive => true, :no_total => true
       when a.ftype != b.ftype
-        count_space b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", :recursive => true
+        diff_line b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", :recursive => true
       when a.lstat.ino != b.lstat.ino
         if a.readable_real? && b.readable_real?
-          count_space b, path, colorize('█≠█', :diff), "#{path}#{b.postfix}" unless b.symlink? && a.readlink == b.readlink
+          diff_line b, path, colorize('█≠█', :diff), "#{path}#{b.postfix}" unless b.symlink? && a.readlink == b.readlink
           if b.directory? && !b.symlink?
             (a.children(false) | b.children(false)).sort.each do |child|
               compare(a / child, b / child, path / child)
@@ -122,9 +122,17 @@ module Tms
       end
     end
 
-    def count_space(backup_path, path, prefix, postfix, options = {})
+    def diff_line(backup_path, path, prefix, postfix, options = {})
+      sub_total = count_space(backup_path, options[:recursive])
+      line "#{prefix} #{space sub_total} #{postfix}"
+      unless options[:no_total]
+        @total += sub_total
+      end
+    end
+
+    def count_space(backup_path, recursive)
       sub_total = 0
-      if options[:recursive]
+      if recursive
         backup_path.find do |sub_path|
           sub_total += sub_path.size_if_real_file
           progress do
@@ -134,10 +142,7 @@ module Tms
       else
         sub_total = backup_path.size_if_real_file
       end
-      line "#{prefix} #{space sub_total} #{postfix}"
-      unless options[:no_total]
-        @total += sub_total
-      end
+      sub_total
     end
 
     def command_exists?(command)

@@ -13,7 +13,7 @@ Jeweler::Tasks.new do |gem|
   gem.license = 'MIT'
   gem.authors = ['Ivan Kuchin']
   gem.add_runtime_dependency 'colored'
-  gem.add_runtime_dependency 'xattr'
+  gem.add_runtime_dependency 'ffi-xattr', '~> 0.0.4'
   gem.add_development_dependency 'jeweler', '~> 1.5.1'
   gem.add_development_dependency 'rake-compiler'
   gem.add_development_dependency 'rake-gem-ghost'

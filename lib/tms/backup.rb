@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require 'xattr'
+require 'ffi-xattr'
 require 'tms.so'
 require 'tms/comparison'
 require 'tms/better_attr_accessor'
@@ -98,11 +98,11 @@ module Tms
       :version => 'com.apple.backup.SnapshotVersion',
       :number  => 'com.apple.backup.SnapshotNumber',
     }.each do |name, attr|
-      class_eval <<-src
+      class_eval <<-RUBY
         def #{name}
           @#{name} ||= xattr.get('#{attr}').to_i rescue '-'
         end
-      src
+      RUBY
     end
 
     def <=>(other)
@@ -112,7 +112,7 @@ module Tms
   private
 
     def xattr
-      @xattr ||= Xattr.new(path)
+      @xattr ||= Xattr.new(path.to_s)
     end
   end
 end

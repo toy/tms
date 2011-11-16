@@ -4,13 +4,13 @@ require 'tms/space'
 
 module Tms
   class Comparison
-    attr_reader :backup_a, :backup_b, :total
+    attr_reader :backup_a, :backup_b
     def initialize(backup_a, backup_b)
       @backup_a, @backup_b = backup_a, backup_b
     end
 
     def run
-      @total = 0
+      @a_total, @b_total = 0, 0
       begin
         root_dirs = (backup_a.path.children(false) | backup_b.path.children(false)).sort
         root_dirs.reject!{ |root_dir| root_dir.path[0, 1] == '.' }
@@ -24,7 +24,7 @@ module Tms
         puts
         puts 'Interrupted'
       end
-      line "#{colorize 'Total:', :total} #{space(total)}"
+      line [colorize('Total:', :total), space(@b_total)].join(' ')
     end
 
   private
@@ -32,21 +32,22 @@ module Tms
     def compare(a, b, path)
       case
       when !a.exist?
-        diff_line b, path, colorize('  █', :right), "#{path}#{b.postfix}", :recursive => true
+        diff_line nil, b, path, colorize('  █', :right), "#{path}#{b.postfix}", true
       when !b.exist?
-        diff_line a, path, colorize('█  ', :left), "#{path}#{a.postfix}", :recursive => true, :no_total => true
+        diff_line a, nil, path, colorize('█  ', :left), "#{path}#{a.postfix}", true
       when a.ftype != b.ftype
-        diff_line b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", :recursive => true
+        diff_line a, b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", true
       when a.lstat.ino != b.lstat.ino
         if a.readable_real? && b.readable_real?
-          diff_line b, path, colorize('█≠█', :diff), "#{path}#{b.postfix}" unless b.symlink? && a.readlink == b.readlink
+          diff_line a, b, path, colorize('█≠█', :diff), "#{path}#{b.postfix}", false unless b.symlink? && a.readlink == b.readlink
           if b.directory? && !b.symlink?
             (a.children(false) | b.children(false)).sort.each do |child|
               compare(a / child, b / child, path / child)
             end
           end
         else
-          line colorize("??? #{Space::NOT_COUNTED_SPACE} #{path}#{a.postfix}", :unreadable)
+          parts = ['???', Space::NOT_COUNTED_SPACE, "#{path}#{a.postfix}"]
+          line colorize(parts.join(' '), :unreadable)
         end
       else
         progress do
@@ -100,11 +101,11 @@ module Tms
       if Tms::Backup.show_progress?
         @last_progress ||= Time.now
         if (now = Time.now) > @last_progress + 0.1
-          line = yield.to_s
+          l = yield.to_s
           if width = terminal_width
-            line = trim_left_colored(line, terminal_width - 1)
+            l = trim_left_colored(l, terminal_width - 1)
           end
-          $stderr.print "#{line}#{CLEAR_LINE}\r"
+          $stderr.print "#{l}#{CLEAR_LINE}\r"
           @last_progress = now
         end
       end
@@ -122,15 +123,15 @@ module Tms
       end
     end
 
-    def diff_line(backup_path, path, prefix, postfix, options = {})
-      sub_total = count_space(backup_path, options[:recursive])
-      line "#{prefix} #{space sub_total} #{postfix}"
-      unless options[:no_total]
-        @total += sub_total
-      end
+    def diff_line(a_path, b_path, path, prefix, postfix, recursive)
+      a_sub_total = a_path ? count_space(a_path, path, prefix, recursive) : nil
+      b_sub_total = b_path ? count_space(b_path, path, prefix, recursive) : nil
+      line [prefix, b_sub_total ? space(b_sub_total) : space(a_sub_total), postfix].join(' ')
+      @a_total += a_sub_total if a_sub_total
+      @b_total += b_sub_total if b_sub_total
     end
 
-    def count_space(backup_path, recursive)
+    def count_space(backup_path, path, prefix, recursive)
       sub_total = 0
       if recursive
         backup_path.find do |sub_path|

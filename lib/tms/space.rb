@@ -30,7 +30,7 @@ module Tms
         case size
         when false
           NOT_COUNTED_SPACE.bold.red
-        when 0
+        when 0, nil
           EMPTY_SPACE
         else
           number, degree = size, 0

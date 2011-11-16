@@ -44,6 +44,7 @@ module Tms
       better_attr_accessor :show_all_columns
       better_attr_accessor :colorize
       better_attr_accessor :show_progress
+      better_attr_accessor :show_both_sizes
 
       def colorize?
         !colorize.nil? ? colorize : $stdout.tty?

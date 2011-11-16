@@ -64,6 +64,12 @@ Options for #{type} (-h to view all options):
       end
     end
 
+    unless type == :list
+      op.on('-b', '--[no-]both-sizes', 'Show sizes for both left and right path') do |show_both_sizes|
+        Tms::Backup.show_both_sizes = show_both_sizes
+      end
+    end
+
     op.on_tail('-h', '--help', 'Show full help') do
       puts option_parser.help
       exit

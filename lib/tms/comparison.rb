@@ -24,7 +24,11 @@ module Tms
         puts
         puts 'Interrupted'
       end
-      line [colorize('Total:', :total), space(@b_total)].join(' ')
+      if Tms::Backup.show_both_sizes?
+        line [colorize('Total:', :total), space(@a_total), space(@b_total)].join(' ')
+      else
+        line [colorize('Total:', :total), space(@b_total)].join(' ')
+      end
     end
 
   private
@@ -46,7 +50,11 @@ module Tms
             end
           end
         else
-          parts = ['???', Space::NOT_COUNTED_SPACE, "#{path}#{a.postfix}"]
+          parts = if Tms::Backup.show_both_sizes?
+            ['???', Space::NOT_COUNTED_SPACE, Space::NOT_COUNTED_SPACE, "#{path}#{a.postfix}"]
+          else
+            ['???', Space::NOT_COUNTED_SPACE, "#{path}#{a.postfix}"]
+          end
           line colorize(parts.join(' '), :unreadable)
         end
       else
@@ -126,7 +134,11 @@ module Tms
     def diff_line(a_path, b_path, path, prefix, postfix, recursive)
       a_sub_total = a_path ? count_space(a_path, path, prefix, recursive) : nil
       b_sub_total = b_path ? count_space(b_path, path, prefix, recursive) : nil
-      line [prefix, b_sub_total ? space(b_sub_total) : space(a_sub_total), postfix].join(' ')
+      if Tms::Backup.show_both_sizes?
+        line [prefix, space(a_sub_total), space(b_sub_total), postfix].join(' ')
+      else
+        line [prefix, b_sub_total ? space(b_sub_total) : space(a_sub_total), postfix].join(' ')
+      end
       @a_total += a_sub_total if a_sub_total
       @b_total += b_sub_total if b_sub_total
     end

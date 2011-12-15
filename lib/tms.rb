@@ -7,7 +7,7 @@ require 'tms/table'
 module Tms
   class << self
     def version
-      File.read(File.join(File.dirname(__FILE__), '../VERSION')).strip
+      Gem.loaded_specs['tms'].version.to_s rescue nil
     end
 
     def list

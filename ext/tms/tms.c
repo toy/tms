@@ -1,6 +1,6 @@
 #include "ruby.h"
 #include <CoreServices/CoreServices.h>
-#include <SystemConfiguration/SystemConfiguration.h>>
+#include <SystemConfiguration/SystemConfiguration.h>
 
 static VALUE backup_volume(VALUE self){
 	OSStatus status = pathTooLongErr;

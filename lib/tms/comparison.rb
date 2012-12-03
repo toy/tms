@@ -12,12 +12,18 @@ module Tms
     def run
       @a_total, @b_total = 0, 0
       begin
-        root_dirs = (backup_a.path.children(false) | backup_b.path.children(false)).sort
-        root_dirs.reject!{ |root_dir| root_dir.path[0, 1] == '.' }
-        root_dirs.each do |root_dir|
-          dirs = Backup.filter_dirs? ? Backup.filter_dirs.map{ |filter_dir| root_dir / filter_dir } : [root_dir]
-          dirs.each do |dir|
-            compare(backup_a.path / dir, backup_b.path / dir, Path.new('/', dir))
+        if Backup.filter_dirs?
+          Backup.filter_dirs.each do |real_dir|
+            real_dir = File.expand_path(real_dir)
+            dir = Tms::Backup.tm_path(real_dir)
+            compare(backup_a.path / dir, backup_b.path / dir, Path.new(real_dir))
+          end
+        else
+          root_dirs = (backup_a.path.children(false) | backup_b.path.children(false)).sort
+          root_dirs.reject!{ |root_dir| root_dir.path[0, 1] == '.' }
+          root_dirs.each do |dir|
+            real_dir = Tms::Backup.real_path(dir)
+            compare(backup_a.path / dir, backup_b.path / dir, Path.new('/', real_dir))
           end
         end
       rescue Interrupt

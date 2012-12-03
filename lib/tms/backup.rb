@@ -35,6 +35,25 @@ module Tms
         @backups_dir = backups_dir
       end
 
+      VOLUMES_PATH = '/Volumes/'
+      def tm_path(path)
+        unless path[0, VOLUMES_PATH.length].downcase == VOLUMES_PATH.downcase
+          path = File.join(root_volume_path, path)
+        end
+        path[VOLUMES_PATH.length - 1..-1]
+      end
+
+      def real_path(path)
+        path = File.join(VOLUMES_PATH, path)
+        path == root_volume_path ? '/' : path
+      end
+
+      def root_volume_path
+        @root_volume_path ||= Dir["#{VOLUMES_PATH}*"].find do |volume_path|
+          File.symlink?(volume_path) && File.readlink(volume_path) == '/'
+        end or abort('can\'t find /Volumes path for root')
+      end
+
       def filter_dirs
         @filter_dirs ||= []
       end

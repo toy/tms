@@ -34,11 +34,14 @@ module Tms
   private
 
     def compare(a, b, path)
+      a_exist, b_exist = a.exist?, b.exist?
       case
-      when !a.exist?
-        diff_line nil, b, path, colorize('  █', :right), "#{path}#{b.postfix}", true
-      when !b.exist?
+      when !a_exist && !b_exist
+        diff_line nil, nil, path, colorize('×××', :unreadable), "#{path}#{b.postfix}", true
+      when !b_exist
         diff_line a, nil, path, colorize('█  ', :left), "#{path}#{a.postfix}", true
+      when !a_exist
+        diff_line nil, b, path, colorize('  █', :right), "#{path}#{b.postfix}", true
       when a.ftype != b.ftype
         diff_line a, b, path, colorize('█≠█', :diff_type), "#{path}#{b.postfix} (#{a.ftype}=>#{b.ftype})", true
       when a.lstat.ino != b.lstat.ino

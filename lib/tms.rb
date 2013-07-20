@@ -61,9 +61,14 @@ module Tms
           a_id, b_id = a_id - 1, a_id
         end
       end
-      backup_a = Backup.list[a_id] or abort("No backup #{a}")
-      backup_b = Backup.list[b_id] or abort("No backup #{b}")
-      Comparison.new(backup_a, backup_b).run
+
+      $stdout.puts "Comparing:"
+      by_id = proc do |name, id|
+        backup = Backup.list[id] or abort("No backup #{name}")
+        $stdout.puts "#{id} #{backup.path}"
+        backup
+      end
+      Comparison.new(by_id[a, a_id], by_id[b, b_id]).run
     end
 
   private

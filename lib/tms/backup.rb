@@ -21,11 +21,12 @@ module Tms
       def backups_dir
         unless @backups_dir
           if system('which -s tmutil')
-            $stderr.print "Using tmutil to detect and mount Time Machine volume\r"
+            $stderr.puts "Using tmutil to detect and mount Time Machine volume"
             self.backups_dir = `tmutil machinedirectory`.strip
           else
             self.backups_dir = Path.new(backup_volume) / 'Backups.backupdb' / computer_name
           end
+          $stderr.puts "Detected: #{self.backups_dir}"
         end
         @backups_dir
       end

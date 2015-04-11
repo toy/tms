@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 require 'ffi-xattr'
-require 'tms.so'
+require 'tms/helpers'
 require 'tms/comparison'
 require 'tms/better_attr_accessor'
 

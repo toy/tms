@@ -58,7 +58,7 @@ static VALUE computer_name(VALUE self){
 	}
 }
 
-void Init_tms() {
+void Init_helpers() {
 	VALUE cTms = rb_define_module("Tms");
 	rb_define_singleton_method(cTms, "backup_volume", backup_volume, 0);
 	rb_define_singleton_method(cTms, "computer_name", computer_name, 0);

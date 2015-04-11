@@ -6,4 +6,4 @@ else
   with_ldflags($LIBS + ' -lCoreFoundation'){ true }
 end
 
-create_makefile('tms')
+create_makefile('tms/helpers')

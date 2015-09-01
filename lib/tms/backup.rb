@@ -11,7 +11,7 @@ module Tms
       extend BetterAttrAccessor
 
       def backup_volume
-        Tms.backup_volume or abort('backup volume not avaliable')
+        Tms.backup_volume or abort('backup volume not available')
       end
 
       def computer_name

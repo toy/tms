@@ -2,6 +2,12 @@
 #include <CoreServices/CoreServices.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 
+#ifdef HAVE_RUBY_ENCODING_H
+#define UTF8_STR_NEW2(str) rb_enc_associate_index(rb_str_new2(str), rb_enc_find_index("UTF-8"))
+#else
+#define UTF8_STR_NEW2(str) rb_str_new2(str)
+#endif
+
 static VALUE backup_volume(VALUE self){
 	OSStatus status = pathTooLongErr;
 	char *path;
@@ -30,7 +36,7 @@ static VALUE backup_volume(VALUE self){
 	}
 
 	if (noErr == status) {
-		return rb_str_new2(path);
+		return UTF8_STR_NEW2(path);
 	} else {
 		return Qnil;
 	}
@@ -40,19 +46,18 @@ static VALUE computer_name(VALUE self){
 	char *name;
 	size_t nameLength;
 
-	CFStringEncoding encoding;
 	CFStringRef cfName;
 
-	if (cfName = SCDynamicStoreCopyComputerName(NULL, &encoding)) {
+	if (cfName = SCDynamicStoreCopyComputerName(NULL, NULL)) {
 		name = malloc(nameLength = 256);
-		while (!CFStringGetCString(cfName, name, nameLength, encoding)) {
+		while (!CFStringGetCString(cfName, name, nameLength, kCFStringEncodingUTF8)) {
 			nameLength += 256;
 			name = reallocf(name, nameLength);
 		}
 
 		CFRelease(cfName);
 
-		return rb_str_new2(name);
+		return UTF8_STR_NEW2(name);
 	} else {
 		return Qnil;
 	}

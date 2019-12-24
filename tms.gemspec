@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version     = '1.7.3'
   s.summary     = %q{Time Machine Status}
   s.description = %Q{View avaliable Time Machine backups and show their diff}
-  s.homepage    = "http://github.com/toy/#{s.name}"
+  s.homepage    = "https://github.com/toy/#{s.name}"
   s.authors     = ['Ivan Kuchin']
   s.license     = 'MIT'
 

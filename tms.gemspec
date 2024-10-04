@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'tms'
-  s.version     = '1.7.3'
+  s.version     = '1.7.4'
   s.summary     = %q{Time Machine Status}
   s.description = %Q{View avaliable Time Machine backups and show their diff}
   s.homepage    = "https://github.com/toy/#{s.name}"

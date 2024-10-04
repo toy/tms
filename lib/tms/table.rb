@@ -11,9 +11,9 @@ module Tms
       yield self if block_given?
     end
 
-    ADJUST = {:left => :ljust, :right => :rjust, :center => :center}
+    ADJUST = {left: :ljust, right: :rjust, center: :center}
     def col(name, color = nil, adjust = nil)
-      @cols << {:name => name, :color => color, :adjust => ADJUST[adjust]}
+      @cols << {name: name, color: color, adjust: ADJUST[adjust]}
     end
 
     def <<(row)
@@ -30,7 +30,7 @@ module Tms
           width, color, adjust = col.values_at(:width, :color, :adjust)
           adjust ||= val.is_a?(Integer) ? :rjust : :ljust
           val_s = val.to_s.send(adjust, width)
-          val_s = Colored.colorize(val_s, :foreground => color) if color
+          val_s = Colored.colorize(val_s, foreground: color) if color
           val_s
         end.join(' ')
       end

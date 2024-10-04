@@ -7,11 +7,11 @@ module Tms
     SIZE_SYMBOLS = %w[B K M G T P E Z Y].freeze
     COLORS = [].tap do |colors|
       [:white, :black, :yellow, :red].each do |color|
-        colors << {:foreground => color}
-        colors << {:foreground => color, :extra => :bold}
+        colors << {foreground: color}
+        colors << {foreground: color, extra: :bold}
       end
-      colors << {:foreground => :yellow, :extra => :reversed}
-      colors << {:foreground => :red, :extra => :reversed}
+      colors << {foreground: :yellow, extra: :reversed}
+      colors << {foreground: :red, extra: :reversed}
     end.freeze
     PRECISION = 1
     LENGTH = 4 + PRECISION + 1

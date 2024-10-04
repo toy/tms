@@ -119,10 +119,10 @@ module Tms
       finished_at - started_at
     end
     {
-      :state   => 'com.apple.backupd.SnapshotState',
-      :type    => 'com.apple.backupd.SnapshotType',
-      :version => 'com.apple.backup.SnapshotVersion',
-      :number  => 'com.apple.backup.SnapshotNumber',
+      state: 'com.apple.backupd.SnapshotState',
+      type: 'com.apple.backupd.SnapshotType',
+      version: 'com.apple.backup.SnapshotVersion',
+      number: 'com.apple.backup.SnapshotNumber',
     }.each do |name, attr|
       class_eval <<-RUBY
         def #{name}

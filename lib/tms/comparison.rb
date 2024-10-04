@@ -74,12 +74,12 @@ module Tms
     end
 
     COLORS = {
-      :total => {:extra => :bold},
-      :right => {:foreground => :green},
-      :left => {:foreground => :blue},
-      :diff_type => {:foreground => :red, :extra => :bold},
-      :diff => {:foreground => :yellow},
-      :unreadable => {:foreground => :red, :extra => :bold},
+      total: {extra: :bold},
+      right: {foreground: :green},
+      left: {foreground: :blue},
+      diff_type: {foreground: :red, extra: :bold},
+      diff: {foreground: :yellow},
+      unreadable: {foreground: :red, extra: :bold},
     }
     CLEAR_LINE = "\e[K"
 
@@ -129,7 +129,7 @@ module Tms
     end
 
     def space(size)
-      Tms::Space.space(size, :color => Tms::Backup.colorize?)
+      Tms::Space.space(size, color: Tms::Backup.colorize?)
     end
 
     def colorize(s, type)

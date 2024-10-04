@@ -1,4 +1,5 @@
 #include "ruby.h"
+#include "ruby/encoding.h"
 #include <CoreServices/CoreServices.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 
